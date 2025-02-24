@@ -1,5 +1,5 @@
 ---
-title: "Brasil-APEC, Dados Comerciais"
+title: "Brasil-CELAC, Dados Comerciais"
 author: "Núcleo de Inteligência - SAEF"
 date: "Últimos dados disponíveis: `r barao2::meses(barao2::comerciobr_get_ultimomes())` de `r barao2::comerciobr_get_ulimoano()`"
 output:
@@ -31,26 +31,25 @@ header-includes:
 - \newcommand{\elandscape}{\end{landscape}}
 - \pagestyle{fancy}
 - \fancyhead{}
-- \fancyhead[CO,CE]{Brasil-APEC, Dados Comerciais}
+- \fancyhead[CO,CE]{Brasil-CELAC, Dados Comerciais}
 - \fancyfoot[CO,CE]{}
 - \fancyfoot[LE,RO]{\thepage}
 tables: yes
 graphics: yes
 ---
 
-- Exceto disposição em contrário, todos os dados estão em USD Bilhões
+-   Exceto disposição em contrário, todos os dados estão em USD Bilhões
 
 ```{r setup, include = F}
 library(barao2)
 library(kableExtra)
 periodo <- "anual"
-pais <- c("Austrália", "Brunei", "Canadá", "Chile", "China", "Hong Kong", "Indonésia", "Japão", "Coreia do Sul",  "Malásia", "México", "Nova Zelândia", "Papua Nova Guiné", "Peru", "Filipinas", "Rússia", "Taiwan (Formosa)", "Singapura", "Tailândia", "Estados Unidos", "Vietnã")
+pais <- c("Antígua e Barbuda", "Argentina", "Bahamas", "Barbados", "Belize", "Bolívia", "Chile", "Colômbia", "Costa Rica", "Cuba", "Dominica", "Equador", "El Salvador", "Granada", "Guatemala", "Guiana", "Haiti", "Honduras", "Jamaica", "México", "Nicarágua", "Panamá", "Paraguai", "Peru", "República Dominicana", "Santa Lúcia", "São Cristóvão e Névis", "São Vicente e Granadinas", "Suriname", "Trinidad e Tobago", "Uruguai", "Venezuela")
 knitr::opts_chunk$set(echo = F, message = F, warning = F, error = T)
 ```
 
 ```{r}
 ```
-
 
 \newpage
 
@@ -87,7 +86,7 @@ knitr::opts_chunk$set(echo = F, message = F, warning = F, error = T)
                         scales = "free_x") +
     ggplot2::scale_y_continuous(labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
     ggplot2::scale_x_discrete(breaks = scales::breaks_pretty()) +
-    ggplot2::labs(title = glue::glue("Brasil-APEC, Fluxo de Com\u00e9rcio {frase}"),
+    ggplot2::labs(title = glue::glue("Brasil-CELAC, Fluxo de Com\u00e9rcio {frase}"),
                   x = NULL, y = NULL, caption = "Fonte: Minist\u00e9rio da Economia") +
     ggthemes::scale_fill_tableau() +
     ggplot2::theme_minimal()
@@ -96,8 +95,6 @@ knitr::opts_chunk$set(echo = F, message = F, warning = F, error = T)
 ```{r, results='asis'}
 purrr::walk(comerciobr_tabela_corrente(pais, periodo), print)
 ```
-
-
 
 \newpage
 
@@ -142,7 +139,7 @@ purrr::walk(comerciobr_tabela_corrente(pais, periodo), print)
     ggthemes::scale_fill_tableau() +
     ggplot2::scale_y_continuous(labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
     tidytext::scale_x_reordered() +
-    ggplot2::labs(title = glue::glue("Brasil-APEC, pauta comercial, {frase}"),
+    ggplot2::labs(title = glue::glue("Brasil-CELAC, pauta comercial, {frase}"),
                   x = NULL, y = NULL, caption = "Fonte: Minist\u00e9rio da Economia")
 
 ```
@@ -227,7 +224,7 @@ if (length(pais) > 1) {
                      type = "index",
                      align.labels=list(c("center", "center"), c("left", "top")),
                      palette = ggthemes::tableau_color_pal('Tableau 10')(10),
-                     title = glue::glue("Brasil-APEC, Propor\u00e7\u00e3o de Exporta\u00e7\u00f5es e Importa\u00e7\u00f5es {frase}"))
+                     title = glue::glue("Brasil-CELAC, Propor\u00e7\u00e3o de Exporta\u00e7\u00f5es e Importa\u00e7\u00f5es {frase}"))
 ```
 
 \blandscape
@@ -273,7 +270,7 @@ if (length(pais) > 1) {
                         nrow = 2) +
     ggthemes::scale_color_pander() +
     ggplot2::theme_minimal() +
-    ggplot2::labs(title = glue::glue("Brasil-APEC, evolu\u00e7\u00e3o do com\u00e9rcio, {frase}"),
+    ggplot2::labs(title = glue::glue("Brasil-CELAC, evolu\u00e7\u00e3o do com\u00e9rcio, {frase}"),
                   caption = "Fonte: Minist\u00e9rio da Economia",
                   x = NULL, y = NULL) +
     ggplot2::scale_y_continuous(labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
@@ -318,7 +315,10 @@ if (periodo == "mensal") {
     dplyr::filter(co_ano >= max(co_ano)-4) %>%
     dplyr::arrange(dplyr::desc(co_ano)) %>%
     dplyr::relocate(co_ano, path, no_sh4_por, co_sh4, value, .data$pct_var, .data$pct_prop) %>%
-    dplyr::mutate(dplyr::across(dplyr::starts_with("val"), scales::label_number(scale_cut = scales::cut_short_scale()))) %>%
+    #dplyr::mutate(dplyr::across(dplyr::starts_with("val"), scales::label_number(scale_cut = scales::cut_short_scale()))) %>%
+    
+    dplyr::mutate(dplyr::across(dplyr::starts_with("val"), ~ formatar_valor_tabela_produto(.x))) %>%
+    
     dplyr::mutate(dplyr::across(dplyr::starts_with("pct_") , scales::label_percent(decimal.mark = ",", accuracy = .1))) %>%
     dplyr::mutate(no_sh4_por = dplyr::case_when(stringr::str_length(no_sh4_por) > 50 ~
                                            paste0(stringr::str_sub(no_sh4_por, 1, 50), ".."),
@@ -365,6 +365,7 @@ barao2::comerciobr_tabela_fatores(pais, periodo, "cgce")
 barao2::comerciobr_tabela_fatores(pais, periodo, "cuci")
 
 ```
+
 \newpage
 
 ## Índices de concentração comercial e de comércio intraindústria
@@ -372,6 +373,7 @@ barao2::comerciobr_tabela_fatores(pais, periodo, "cuci")
 ```{r, fig.height=5}
 barao2::comerciobr_grafico_concentracao_intraindustria(periodo, pais)
 ```
+
 ```{r, results='asis'}
 purrr::walk(comerciobr_tabelas_comercio(pais, periodo), print)
 ```
@@ -384,9 +386,9 @@ O índice Herfindahl-Hirschman, originalmente utilizado para a caracterização 
 
 O índice é aqui calculado com base na desagregação das pautas até o nível de dois dígitos (SH2). Quanto maior o valor do índice, mais concentrada é a pauta. O índice varia entre os valores de 0 e 1. Nas situações extremas teríamos:
 
-* 1 = Somente um produto compõe a pauta
+-   1 = Somente um produto compõe a pauta
 
-* 0 = Infinitos produtos compõem a pauta
+-   0 = Infinitos produtos compõem a pauta
 
 ### Comércio intraindústria
 
@@ -394,10 +396,9 @@ O índice Grubel-Lloyd foi originalmente concebido para avaliar o comércio intr
 
 O índice é aqui calculado com base na desagregação até o nível de dois dígitos (SH2) e somente para produtos caracterizados como industrializados em um corte simplificado (SH2 entre 16 e 67 e acima de 72). Quanto maior o valor do índice, maior é o comércio intraindústria. O índice varia entre os valores de 0 e 1. Nas situações extremas teríamos:
 
-* 1 = O comércio intraindústria é total (haveria reexportação ou reimportação de todos os produtos)
+-   1 = O comércio intraindústria é total (haveria reexportação ou reimportação de todos os produtos)
 
-* 0 = Não há comércio intraindústria
-
+-   0 = Não há comércio intraindústria
 
 \newpage
 
@@ -439,7 +440,7 @@ periodo <- "mensal"
                         scales = "free_x") +
     ggplot2::scale_y_continuous(labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
     ggplot2::scale_x_discrete(breaks = scales::breaks_pretty()) +
-    ggplot2::labs(title = glue::glue("Brasil-APEC, Fluxo de Com\u00e9rcio {frase}"),
+    ggplot2::labs(title = glue::glue("Brasil-CELAC, Fluxo de Com\u00e9rcio {frase}"),
                   x = NULL, y = NULL, caption = "Fonte: Minist\u00e9rio da Economia") +
     ggthemes::scale_fill_tableau() +
     ggplot2::theme_minimal()
@@ -492,7 +493,7 @@ purrr::walk(comerciobr_tabela_corrente(pais, periodo), print)
     ggthemes::scale_fill_tableau() +
     ggplot2::scale_y_continuous(labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
     tidytext::scale_x_reordered() +
-    ggplot2::labs(title = glue::glue("Brasil-APEC, pauta comercial, {frase}"),
+    ggplot2::labs(title = glue::glue("Brasil-CELAC, pauta comercial, {frase}"),
                   x = NULL, y = NULL, caption = "Fonte: Minist\u00e9rio da Economia")
 ```
 
@@ -576,7 +577,7 @@ purrr::walk(comerciobr_tabela_corrente(pais, periodo), print)
                      type = "index",
                      align.labels=list(c("center", "center"), c("left", "top")),
                      palette = ggthemes::tableau_color_pal('Tableau 10')(10),
-                     title = glue::glue("Brasil-APEC, Propor {frase}"))
+                     title = glue::glue("Brasil-CELAC, Propor {frase}"))
 ```
 
 \blandscape
@@ -622,7 +623,7 @@ if (length(pais) > 1) {
                         nrow = 2) +
     ggthemes::scale_color_pander() +
     ggplot2::theme_minimal() +
-    ggplot2::labs(title = glue::glue("Brasil-APEC, evolu\u00e7\u00e3o do com\u00e9rcio, {frase}"),
+    ggplot2::labs(title = glue::glue("Brasil-CELAC, evolu\u00e7\u00e3o do com\u00e9rcio, {frase}"),
                   caption = "Fonte: Minist\u00e9rio da Economia",
                   x = NULL, y = NULL) +
     ggplot2::scale_y_continuous(labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
@@ -667,7 +668,9 @@ if (periodo == "mensal") {
     dplyr::filter(co_ano >= max(co_ano)-4) %>%
     dplyr::arrange(dplyr::desc(co_ano)) %>%
     dplyr::relocate(co_ano, path, no_sh4_por, co_sh4, value, .data$pct_var, .data$pct_prop) %>%
-    dplyr::mutate(dplyr::across(dplyr::starts_with("val"), scales::label_number(scale_cut = scales::cut_short_scale()))) %>%
+    #dplyr::mutate(dplyr::across(dplyr::starts_with("val"), scales::label_number(scale_cut = scales::cut_short_scale()))) %>%
+    dplyr::mutate(dplyr::across(dplyr::starts_with("val"), ~ formatar_valor_tabela_produto(.x))) %>%
+  
     dplyr::mutate(dplyr::across(dplyr::starts_with("pct_") , scales::label_percent(decimal.mark = ",", accuracy = .1))) %>%
     dplyr::mutate(no_sh4_por = dplyr::case_when(stringr::str_length(no_sh4_por) > 50 ~
                                            paste0(stringr::str_sub(no_sh4_por, 1, 50), ".."),
@@ -722,6 +725,7 @@ barao2::comerciobr_tabela_fatores(pais, periodo, "cuci")
 ```{r, fig.height=5}
 barao2::comerciobr_grafico_concentracao_intraindustria(periodo, pais)
 ```
+
 ```{r, results='asis'}
 purrr::walk(comerciobr_tabelas_comercio(pais, periodo), print)
 ```
@@ -734,9 +738,9 @@ O índice Herfindahl-Hirschman, originalmente utilizado para a caracterização 
 
 O índice é aqui calculado com base na desagregação das pautas até o nível de dois dígitos (SH2). Quanto maior o valor do índice, mais concentrada é a pauta. O índice varia entre os valores de 0 e 1. Nas situações extremas teríamos:
 
-* 1 = Somente um produto compõe a pauta
+-   1 = Somente um produto compõe a pauta
 
-* 0 = Infinitos produtos compõem a pauta
+-   0 = Infinitos produtos compõem a pauta
 
 ### Comércio intraindústria
 
@@ -744,6 +748,6 @@ O índice Grubel-Lloyd foi originalmente concebido para avaliar o comércio intr
 
 O índice é aqui calculado com base na desagregação até o nível de dois dígitos (SH2) e somente para produtos caracterizados como industrializados em um corte simplificado (SH2 entre 16 e 67 e acima de 72). Quanto maior o valor do índice, maior é o comércio intraindústria. O índice varia entre os valores de 0 e 1. Nas situações extremas teríamos:
 
-* 1 = O comércio intraindústria é total (haveria reexportação ou reimportação de todos os produtos)
+-   1 = O comércio intraindústria é total (haveria reexportação ou reimportação de todos os produtos)
 
-* 0 = Não há comércio intraindústria
+-   0 = Não há comércio intraindústria
